@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const express = require('express');
 const session = require('express-session');
 const { generators, Issuer } = require('openid-client');
+const { renderPage } = require('./renderPage');
 
 const app = express();
 const PORT = 3000;
@@ -14,21 +15,6 @@ app.use(
     saveUninitialized: false
   })
 );
-
-function renderPage({ title, body }) {
-  return `<!doctype html>
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${title}</title>
-  </head>
-  <body>
-    <h1>${title}</h1>
-    ${body}
-  </body>
-</html>`;
-}
 
 async function getClient() {
   if (!app.locals.client) {

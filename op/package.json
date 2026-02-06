@@ -6,7 +6,8 @@
   "description": "Sample OpenID Provider using oidc-provider.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "node --test"
   },
   "dependencies": {
     "oidc-provider": "^8.3.0"

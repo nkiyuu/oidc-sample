@@ -23,6 +23,12 @@ npm start
 
 `http://localhost:4000` で OP が起動します。
 
+テストを実行する場合:
+
+```bash
+npm test
+```
+
 ### 2. RP を起動
 
 別ターミナルで:
@@ -34,6 +40,12 @@ npm start
 ```
 
 `http://localhost:3000` にアクセスし、ログインボタンから OIDC フローを確認できます。
+
+テストを実行する場合:
+
+```bash
+npm test
+```
 
 ## 参考
 

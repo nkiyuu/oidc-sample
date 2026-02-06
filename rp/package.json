@@ -6,7 +6,8 @@
   "description": "Sample OpenID Relying Party using openid-client.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "node --test"
   },
   "dependencies": {
     "express": "^4.19.2",
