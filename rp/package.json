@@ -1,0 +1,17 @@
+{
+  "name": "oidc-rp-sample",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Sample OpenID Relying Party using openid-client.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "openid-client": "^5.7.0"
+  }
+}
