@@ -1,0 +1,14 @@
+{
+  "name": "oidc-op-sample",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Sample OpenID Provider using oidc-provider.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "oidc-provider": "^8.3.0"
+  }
+}
