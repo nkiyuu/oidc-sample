@@ -39,7 +39,7 @@ npm install
 npm start
 ```
 
-`http://localhost:3000` にアクセスし、ログインボタンから OIDC フローを確認できます。
+`http://localhost:3000` にアクセスし、ログインボタンから OIDC フロー（Authorization Code / Implicit）を確認できます。
 
 テストを実行する場合:
 
