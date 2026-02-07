@@ -50,3 +50,24 @@ npm test
 ## 参考
 
 このサンプルは `oidc-provider` の dev interaction を有効にしています。画面上のログインフォームで適当なユーザー名・パスワードを入力して進めてください。
+
+## Docker で起動する場合
+
+Docker Compose で OP と RP をまとめて起動できます。
+
+```bash
+docker compose up --build
+```
+
+`http://localhost:3000` にアクセスして動作を確認してください。
+
+### 環境変数
+
+OP / RP の URL を変更したい場合は、以下の環境変数を指定できます。
+
+- `OP_ISSUER`: OP の issuer URL（例: `http://localhost:4000`）
+- `OP_PORT`: OP の待受ポート（例: `4000`）
+- `RP_BASE_URL`: RP の外部 URL（例: `http://localhost:3000`）
+- `RP_PORT`: RP の待受ポート（例: `3000`）
+
+`docker-compose.yml` は Linux 環境向けに `network_mode: host` を使っています。macOS/Windows で利用する場合は、`network_mode` を削除し、`OP_ISSUER` と `RP_BASE_URL` にホストからアクセス可能な URL を設定してください。

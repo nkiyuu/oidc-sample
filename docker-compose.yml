@@ -1,0 +1,17 @@
+services:
+  op:
+    build:
+      context: ./op
+    network_mode: host
+    environment:
+      OP_ISSUER: http://localhost:4000
+      OP_PORT: 4000
+      RP_BASE_URL: http://localhost:3000
+  rp:
+    build:
+      context: ./rp
+    network_mode: host
+    environment:
+      OP_ISSUER: http://localhost:4000
+      RP_BASE_URL: http://localhost:3000
+      RP_PORT: 3000
