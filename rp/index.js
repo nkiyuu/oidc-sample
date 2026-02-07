@@ -5,7 +5,7 @@ const { generators, Issuer } = require('openid-client');
 const { renderPage } = require('./renderPage');
 
 const app = express();
-const PORT = Number(process.env.RP_PORT ?? 3000);
+const PORT = Number(process.env.PORT ?? process.env.RP_PORT ?? 3000);
 const RP_BASE_URL = process.env.RP_BASE_URL ?? `http://localhost:${PORT}`;
 const ISSUER = process.env.OP_ISSUER ?? 'http://localhost:4000';
 

@@ -71,3 +71,36 @@ OP / RP の URL を変更したい場合は、以下の環境変数を指定で�
 - `RP_PORT`: RP の待受ポート（例: `3000`）
 
 `docker-compose.yml` は Linux 環境向けに `network_mode: host` を使っています。macOS/Windows で利用する場合は、`network_mode` を削除し、`OP_ISSUER` と `RP_BASE_URL` にホストからアクセス可能な URL を設定してください。
+
+## Google Cloud Run にデプロイする場合
+
+Cloud Run ではサービスごとにコンテナをデプロイするため、OP と RP を別サービスとしてデプロイします。
+各サービスの URL が HTTPS になる点を前提に、OP/RP の環境変数を調整してください。
+
+### 事前準備
+
+- gcloud CLI をセットアップし、対象プロジェクトを選択する
+- Container Registry または Artifact Registry を利用できるようにする
+
+### OP をデプロイ
+
+```bash
+gcloud run deploy oidc-op \
+  --source ./op \
+  --region asia-northeast1 \
+  --set-env-vars OP_ISSUER=https://<OPのCloud Run URL>,RP_BASE_URL=https://<RPのCloud Run URL>
+```
+
+### RP をデプロイ
+
+```bash
+gcloud run deploy oidc-rp \
+  --source ./rp \
+  --region asia-northeast1 \
+  --set-env-vars OP_ISSUER=https://<OPのCloud Run URL>,RP_BASE_URL=https://<RPのCloud Run URL>
+```
+
+### 注意点
+
+- Cloud Run は `PORT` 環境変数を使うため、OP/RP ともに `PORT` が優先されます。
+- OP/RP の URL が変わる場合は、両方の `OP_ISSUER` / `RP_BASE_URL` を合わせて更新してください。
