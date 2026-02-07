@@ -1,5 +1,6 @@
-const issuer = 'http://localhost:4000';
-const port = 4000;
+const issuer = process.env.OP_ISSUER ?? 'http://localhost:4000';
+const port = Number(process.env.OP_PORT ?? 4000);
+const rpBaseUrl = process.env.RP_BASE_URL ?? 'http://localhost:3000';
 
 const configuration = {
   clients: [
@@ -8,8 +9,8 @@ const configuration = {
       client_secret: 'rp-secret',
       grant_types: ['authorization_code', 'refresh_token', 'implicit'],
       response_types: ['code', 'id_token', 'id_token token'],
-      redirect_uris: ['http://localhost:3000/callback', 'http://localhost:3000/callback-implicit'],
-      post_logout_redirect_uris: ['http://localhost:3000/logout/callback'],
+      redirect_uris: [`${rpBaseUrl}/callback`, `${rpBaseUrl}/callback-implicit`],
+      post_logout_redirect_uris: [`${rpBaseUrl}/logout/callback`],
       token_endpoint_auth_method: 'client_secret_basic'
     }
   ],

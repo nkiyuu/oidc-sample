@@ -5,8 +5,9 @@ const { generators, Issuer } = require('openid-client');
 const { renderPage } = require('./renderPage');
 
 const app = express();
-const PORT = 3000;
-const ISSUER = 'http://localhost:4000';
+const PORT = Number(process.env.RP_PORT ?? 3000);
+const RP_BASE_URL = process.env.RP_BASE_URL ?? `http://localhost:${PORT}`;
+const ISSUER = process.env.OP_ISSUER ?? 'http://localhost:4000';
 
 app.use(
   session({
@@ -23,8 +24,8 @@ async function getClient() {
     app.locals.client = new issuer.Client({
       client_id: 'rp-client',
       client_secret: 'rp-secret',
-      redirect_uris: ['http://localhost:3000/callback', 'http://localhost:3000/callback-implicit'],
-      post_logout_redirect_uris: ['http://localhost:3000/logout/callback'],
+      redirect_uris: [`${RP_BASE_URL}/callback`, `${RP_BASE_URL}/callback-implicit`],
+      post_logout_redirect_uris: [`${RP_BASE_URL}/logout/callback`],
       response_types: ['code', 'id_token', 'id_token token']
     });
   }
@@ -104,7 +105,7 @@ app.get('/callback', async (req, res, next) => {
     const params = client.callbackParams(req);
     const authRequest = req.session.authRequest || {};
 
-    const tokenSet = await client.callback('http://localhost:3000/callback', params, {
+    const tokenSet = await client.callback(`${RP_BASE_URL}/callback`, params, {
       state: authRequest.state,
       nonce: authRequest.nonce,
       code_verifier: authRequest.codeVerifier
@@ -129,7 +130,7 @@ app.post('/callback-implicit', async (req, res, next) => {
     const params = client.callbackParams(req);
     const authRequest = req.session.authRequest || {};
 
-    const tokenSet = await client.callback('http://localhost:3000/callback-implicit', params, {
+    const tokenSet = await client.callback(`${RP_BASE_URL}/callback-implicit`, params, {
       state: authRequest.state,
       nonce: authRequest.nonce
     });
@@ -157,7 +158,7 @@ app.get('/logout', async (req, res, next) => {
     req.session.destroy(() => {
       const url = client.endSessionUrl({
         id_token_hint: idToken,
-        post_logout_redirect_uri: 'http://localhost:3000/logout/callback',
+        post_logout_redirect_uri: `${RP_BASE_URL}/logout/callback`,
         state: crypto.randomUUID()
       });
 
@@ -183,5 +184,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`OIDC RP listening on http://localhost:${PORT}`);
+  console.log(`OIDC RP listening on ${RP_BASE_URL}`);
 });
