@@ -6,9 +6,9 @@ const configuration = {
     {
       client_id: 'rp-client',
       client_secret: 'rp-secret',
-      grant_types: ['authorization_code', 'refresh_token'],
-      response_types: ['code'],
-      redirect_uris: ['http://localhost:3000/callback'],
+      grant_types: ['authorization_code', 'refresh_token', 'implicit'],
+      response_types: ['code', 'id_token', 'id_token token'],
+      redirect_uris: ['http://localhost:3000/callback', 'http://localhost:3000/callback-implicit'],
       post_logout_redirect_uris: ['http://localhost:3000/logout/callback'],
       token_endpoint_auth_method: 'client_secret_basic'
     }
