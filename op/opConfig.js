@@ -8,8 +8,12 @@ const configuration = {
       client_id: 'rp-client',
       client_secret: 'rp-secret',
       grant_types: ['authorization_code', 'refresh_token', 'implicit'],
-      response_types: ['code', 'id_token', 'id_token token'],
-      redirect_uris: [`${rpBaseUrl}/callback`, `${rpBaseUrl}/callback-implicit`],
+      response_types: ['code', 'id_token', 'id_token token', 'code id_token', 'code token', 'code id_token token'],
+      redirect_uris: [
+        `${rpBaseUrl}/callback`,
+        `${rpBaseUrl}/callback-implicit`,
+        `${rpBaseUrl}/callback-hybrid`
+      ],
       post_logout_redirect_uris: [`${rpBaseUrl}/logout/callback`],
       token_endpoint_auth_method: 'client_secret_basic'
     }
