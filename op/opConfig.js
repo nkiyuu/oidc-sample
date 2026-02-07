@@ -1,5 +1,5 @@
 const issuer = process.env.OP_ISSUER ?? 'http://localhost:4000';
-const port = Number(process.env.OP_PORT ?? 4000);
+const port = Number(process.env.PORT ?? process.env.OP_PORT ?? 4000);
 const rpBaseUrl = process.env.RP_BASE_URL ?? 'http://localhost:3000';
 
 const configuration = {
