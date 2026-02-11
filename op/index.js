@@ -1,8 +1,18 @@
-const { Provider } = require('oidc-provider');
-const { configuration, issuer, port } = require('./opConfig');
+const { configuration, issuer, port, host } = require('./opConfig');
 
-const provider = new Provider(issuer, configuration);
+// oidc-provider is ESM-only; load it via dynamic import in CommonJS.
+(async () => {
+  const { Provider } = await import('oidc-provider');
+  const provider = new Provider(issuer, configuration);
 
-provider.listen(port, () => {
-  console.log(`OIDC OP listening on ${issuer}`);
+  provider.on('server_error', (ctx, err) => {
+    console.error('OIDC server_error:', err);
+  });
+
+  provider.listen(port, host, () => {
+    console.log(`OIDC OP listening on ${issuer}`);
+  });
+})().catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
 });

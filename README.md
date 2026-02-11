@@ -41,6 +41,8 @@ npm start
 
 `http://localhost:3000` にアクセスし、ログインボタンから OIDC フロー（Authorization Code / Implicit / Hybrid）を確認できます。
 
+※ ローカルの `http://` 環境では `post_logout_redirect_uri` を登録/送信しません（`oidc-provider` は implicit 用の HTTPS 制約を適用するため）。HTTPS の URL を `RP_BASE_URL` に設定した場合のみ有効化されます。
+
 テストを実行する場合:
 
 ```bash

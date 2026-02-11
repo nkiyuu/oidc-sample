@@ -24,20 +24,9 @@ async function getClient() {
     app.locals.client = new issuer.Client({
       client_id: 'rp-client',
       client_secret: 'rp-secret',
-      redirect_uris: [
-        `${RP_BASE_URL}/callback`,
-        `${RP_BASE_URL}/callback-implicit`,
-        `${RP_BASE_URL}/callback-hybrid`
-      ],
+      redirect_uris: [`${RP_BASE_URL}/callback`, `${RP_BASE_URL}/callback/fragment`],
       post_logout_redirect_uris: [`${RP_BASE_URL}/logout/callback`],
-      response_types: [
-        'code',
-        'id_token',
-        'id_token token',
-        'code id_token',
-        'code token',
-        'code id_token token'
-      ]
+      response_types: ['code', 'id_token', 'code id_token']
     });
   }
 
@@ -52,8 +41,8 @@ app.get('/', (req, res) => {
        <p><a href="/logout">ログアウト</a></p>`
     : `<p>未ログインです。</p>
        <p><a href="/login">ログイン (Authorization Code)</a></p>
-       <p><a href="/login-implicit">ログイン (Implicit)</a></p>
-       <p><a href="/login-hybrid">ログイン (Hybrid)</a></p>`;
+       <p><a href="/login/implicit">ログイン (Implicit)</a></p>
+       <p><a href="/login/hybrid">ログイン (Hybrid)</a></p>`;
 
   res.send(renderPage({ title: 'OIDC RP サンプル', body }));
 });
@@ -76,6 +65,8 @@ app.get('/login', async (req, res, next) => {
       scope: 'openid profile email',
       state,
       nonce,
+      response_type: 'code',
+      redirect_uri: `${RP_BASE_URL}/callback`,
       code_challenge: codeChallenge,
       code_challenge_method: 'S256'
     });
@@ -86,7 +77,7 @@ app.get('/login', async (req, res, next) => {
   }
 });
 
-app.get('/login-implicit', async (req, res, next) => {
+app.get('/login/implicit', async (req, res, next) => {
   try {
     const client = await getClient();
     const state = generators.state();
@@ -101,8 +92,8 @@ app.get('/login-implicit', async (req, res, next) => {
       scope: 'openid profile email',
       state,
       nonce,
-      response_type: 'id_token token',
-      response_mode: 'form_post'
+      response_type: 'id_token',
+      redirect_uri: `${RP_BASE_URL}/callback/fragment`
     });
 
     res.redirect(authorizationUrl);
@@ -111,7 +102,7 @@ app.get('/login-implicit', async (req, res, next) => {
   }
 });
 
-app.get('/login-hybrid', async (req, res, next) => {
+app.get('/login/hybrid', async (req, res, next) => {
   try {
     const client = await getClient();
     const state = generators.state();
@@ -129,10 +120,10 @@ app.get('/login-hybrid', async (req, res, next) => {
       scope: 'openid profile email',
       state,
       nonce,
-      code_challenge: codeChallenge,
-      code_challenge_method: 'S256',
       response_type: 'code id_token',
-      response_mode: 'form_post'
+      redirect_uri: `${RP_BASE_URL}/callback/fragment`,
+      code_challenge: codeChallenge,
+      code_challenge_method: 'S256'
     });
 
     res.redirect(authorizationUrl);
@@ -166,40 +157,43 @@ app.get('/callback', async (req, res, next) => {
   }
 });
 
-app.post('/callback-implicit', async (req, res, next) => {
-  try {
-    const client = await getClient();
-    const params = client.callbackParams(req);
-    const authRequest = req.session.authRequest || {};
-
-    const tokenSet = await client.callback(`${RP_BASE_URL}/callback-implicit`, params, {
-      state: authRequest.state,
-      nonce: authRequest.nonce
+app.get('/callback/fragment', (req, res) => {
+  res.send(
+    renderPage({
+      title: 'ログイン処理中',
+      body: `<script>
+  (function () {
+    var hash = window.location.hash;
+    if (!hash || hash.length < 2) {
+      document.body.innerHTML = '<p>認可応答が見つかりません。</p>';
+      return;
+    }
+    var form = document.createElement('form');
+    form.method = 'post';
+    form.action = '${RP_BASE_URL}/callback/fragment';
+    var params = new URLSearchParams(hash.slice(1));
+    params.forEach(function (value, key) {
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
     });
-
-    const claims = tokenSet.claims();
-    const userinfo = tokenSet.access_token
-      ? await client.userinfo(tokenSet.access_token)
-      : { sub: claims.sub };
-
-    req.session.user = {
-      tokens: tokenSet,
-      userinfo
-    };
-
-    res.redirect('/');
-  } catch (error) {
-    next(error);
-  }
+    document.body.appendChild(form);
+    form.submit();
+  })();
+</script>`
+    })
+  );
 });
 
-app.post('/callback-hybrid', async (req, res, next) => {
+app.post('/callback/fragment', async (req, res, next) => {
   try {
     const client = await getClient();
-    const params = client.callbackParams(req);
+    const params = req.body || {};
     const authRequest = req.session.authRequest || {};
 
-    const tokenSet = await client.callback(`${RP_BASE_URL}/callback-hybrid`, params, {
+    const tokenSet = await client.callback(`${RP_BASE_URL}/callback/fragment`, params, {
       state: authRequest.state,
       nonce: authRequest.nonce,
       code_verifier: authRequest.codeVerifier
@@ -207,7 +201,7 @@ app.post('/callback-hybrid', async (req, res, next) => {
 
     const userinfo = tokenSet.access_token
       ? await client.userinfo(tokenSet.access_token)
-      : { sub: tokenSet.claims().sub };
+      : null;
 
     req.session.user = {
       tokens: tokenSet,

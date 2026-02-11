@@ -2,16 +2,21 @@ services:
   op:
     build:
       context: ./op
-    network_mode: host
+    ports:
+      - "4000:4000"
     environment:
-      OP_ISSUER: http://localhost:4000
+      OP_HOST: 0.0.0.0
+      OP_ISSUER: http://op.localtest.me:4000
       OP_PORT: 4000
       RP_BASE_URL: http://localhost:3000
   rp:
     build:
       context: ./rp
-    network_mode: host
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "op.localtest.me:host-gateway"
     environment:
-      OP_ISSUER: http://localhost:4000
+      OP_ISSUER: http://op.localtest.me:4000
       RP_BASE_URL: http://localhost:3000
       RP_PORT: 3000
