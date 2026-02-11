@@ -22,6 +22,9 @@ const configuration = {
   features: {
     devInteractions: { enabled: true }
   },
+  pkce: {
+    required: () => false
+  },
   cookies: {
     keys: ['replace-this-cookie-secret'],
     long: { signed: true },
